@@ -9,6 +9,8 @@ from scraper.ajio_scraper import scrape_ajio, insert_into_db
 
 from backend.price_detector import detect_and_queue
 
+from backend.alert_sender import process_alert_queue
+
 app = FastAPI()
 
 # CORS (frontend connect ke liye)
@@ -38,22 +40,22 @@ def history(id: int):
 # RUN SCRAPER API (IMPORTANT)
 # -------------------------
 @app.get("/run-scraper")
+@app.get("/run-scraper")
 def run_scraper():
-    try:
-        data = scrape_ajio("nike")
-        insert_into_db(data)
+    data = scrape_ajio("nike")
+    insert_into_db(data)
 
-        drops = detect_and_queue()
+    from backend.price_detector import detect_and_queue
+    drops = detect_and_queue()
 
-        return {
-            "status": "done",
-            "inserted": len(data),
-            "drops_detected": drops
-        }
+    from backend.alert_sender import process_alert_queue
+    process_alert_queue()   # 🔥 THIS WAS MISSING
 
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-
+    return {
+        "status": "done",
+        "inserted": len(data),
+        "drops_detected": drops
+    }
 from backend.alert_sender import _send_email
 
 @app.get("/test-email")
