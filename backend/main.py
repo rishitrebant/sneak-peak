@@ -53,3 +53,20 @@ def run_scraper():
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+from backend.alert_sender import _send_email
+
+@app.get("/test-email")
+def test_email():
+    dummy = {
+        "email": "sneakpeak.connect@gmail.com",  
+        "name": "Nike Test Sneaker",
+        "old_price": 5000,
+        "new_price": 3500,
+        "drop_pct": 30,
+        "platform": "Ajio",
+        "url": "https://ajio.com/test"
+    }
+
+    _send_email(dummy)
+    return {"status": "email sent"}
